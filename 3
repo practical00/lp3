@@ -90,3 +90,97 @@ public class Fibonacci {
         sc.close();
     }
 }
+
+
+===============================================================================================
+
+
+
+import java.util.Scanner;
+
+public class Fibonacci {
+
+    static int steps = 0;
+
+    // Non-Recursive Method
+    static void nonRecursive(int n) {
+
+        int a = 0, b = 1, c;
+        int steps = 0;
+
+        System.out.println("Fibonacci Series:");
+
+        for (int i = 0; i < n; i++) {
+
+            System.out.print(a + " ");
+
+            c = a + b;
+            a = b;
+            b = c;
+
+            steps++;
+        }
+
+        System.out.println("\nSteps Count: " + steps);
+        System.out.println("Time Complexity: O(n)");
+        System.out.println("Space Complexity: O(1)");
+    }
+
+    // Recursive Method
+    static int fib(int n) {
+
+        steps++;
+
+        if (n <= 1)
+            return n;
+
+        return fib(n - 1) + fib(n - 2);
+    }
+
+    // Main Method
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("1. Non-Recursive");
+        System.out.println("2. Recursive");
+
+        System.out.print("Enter your choice: ");
+        int choice = sc.nextInt();
+
+        System.out.print("Enter number of terms: ");
+        int n = sc.nextInt();
+
+        if (n < 0) {
+            System.out.println("Invalid input");
+        }
+        else {
+
+            switch (choice) {
+
+                case 1:
+                    nonRecursive(n);
+                    break;
+
+                case 2:
+                    steps = 0;
+
+                    System.out.println("Fibonacci Series:");
+
+                    for (int i = 0; i < n; i++) {
+                        System.out.print(fib(i) + " ");
+                    }
+
+                    System.out.println("\nSteps Count: " + steps);
+                    System.out.println("Time Complexity: O(2^n)");
+                    System.out.println("Space Complexity: O(n)");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice");
+            }
+        }
+
+        sc.close();
+    }
+}
