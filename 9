@@ -1,0 +1,121 @@
+
+import java.util.*;
+
+public class Main {
+
+    static int N;
+    static int board[][];
+
+    // Check whether queen can be placed safely
+    static boolean isSafe(int row, int col) {
+
+        // Check left side of current row
+        for (int i = 0; i < col; i++) {
+            if (board[row][i] == 1)
+                return false;
+        }
+
+        // Check upper diagonal
+        for (int i = row, j = col;
+             i >= 0 && j >= 0; i--, j--) {
+
+            if (board[i][j] == 1)
+                return false;
+        }
+
+        // Check lower diagonal
+        for (int i = row, j = col;
+             i < N && j >= 0; i++, j--) {
+
+            if (board[i][j] == 1)
+                return false;
+        }
+
+        return true;
+    }
+
+    // Solve using backtracking
+    static boolean solve(int col) {
+
+        if (col >= N)
+            return true;
+
+        for (int row = 0; row < N; row++) {
+
+            if (isSafe(row, col)) {
+
+                board[row][col] = 1;
+
+                if (solve(col + 1))
+                    return true;
+
+                // Backtracking
+                board[row][col] = 0;
+            }
+        }
+
+        return false;
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter value of N: ");
+        N = sc.nextInt();
+
+        if (N <= 0) {
+            System.out.println("Invalid value of N");
+            sc.close();
+            return;
+        }
+
+        board = new int[N][N];
+
+        System.out.print("Enter first Queen row (1 to " + N + "): ");
+        int row = sc.nextInt();
+
+        System.out.print("Enter first Queen column (1 to " + N + "): ");
+        int col = sc.nextInt();
+
+        if (row < 1 || row > N || col < 1 || col > N) {
+            System.out.println("Invalid Queen position");
+            sc.close();
+            return;
+        }
+
+        // Place first queen
+        board[row - 1][col - 1] = 1;
+
+        System.out.println("\nInitial Matrix:");
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        if (solve(col)) {
+
+            System.out.println("\nN Queens Solution:");
+
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N; j++) {
+                    System.out.print(board[i][j] + " ");
+                }
+                System.out.println();
+            }
+
+        } else {
+            System.out.println("No solution exists");
+        }
+
+        sc.close();
+    }
+}
+
+/*
+Time Complexity: O(N!)
+Space Complexity: O(N^2)
+*/
