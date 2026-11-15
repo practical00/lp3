@@ -1,0 +1,41 @@
+
+import java.util.Scanner;
+
+public class FibonacciRecursive {
+
+    static int steps = 0;
+
+    static int fib(int n) {
+
+        steps++;
+
+        if (n == 0)
+            return 0;
+
+        if (n == 1)
+            return 1;
+
+        return fib(n - 1) + fib(n - 2);
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of terms: ");
+        int n = sc.nextInt();
+
+        System.out.println("Fibonacci Series:");
+
+        for (int i = 0; i < n; i++) {
+            System.out.print(fib(i) + " ");
+        }
+
+        System.out.println("\nSteps Count: " + steps);
+
+        System.out.println("Time Complexity: O(2^n)");
+        System.out.println("Space Complexity: O(n)");
+
+        sc.close();
+    }
+}
