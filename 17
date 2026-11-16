@@ -1,0 +1,22 @@
+# Gradient Descent Algorithm
+
+# Define the function
+def f(x):
+    return (x + 3)**2
+
+# Define the derivative of the function
+def df(x):
+    return 2 * (x + 3)
+
+# Initial values
+x = 2
+learning_rate = 0.1
+iterations = 100
+
+# Apply Gradient Descent
+for i in range(iterations):
+    x = x - learning_rate * df(x)
+
+# Display the result
+print("Local Minima at x =", x)
+print("Minimum value of y =", f(x))
