@@ -1,0 +1,143 @@
+# 1. Import Libraries
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+
+# 2. Read Dataset
+
+df = pd.read_csv("Churn_Modelling.csv")
+
+print("Dataset:")
+print(df.head())
+
+print("\nDataset Shape:")
+print(df.shape)
+
+
+# 3. Separate Features and Target
+
+X = df.drop(
+    ['RowNumber', 'CustomerId', 'Surname', 'Exited'],
+    axis=1
+)
+
+y = df['Exited']
+
+# Convert categorical data into numerical values
+X = pd.get_dummies(X, drop_first=True, dtype=int)
+
+
+# 4. Split Dataset
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+print("\nTraining Data:", X_train.shape)
+print("Testing Data:", X_test.shape)
+
+
+# 5. Normalize Data
+
+sc = StandardScaler()
+
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
+
+
+# 6. Build Neural Network Model
+
+model = MLPClassifier(
+    hidden_layer_sizes=(32, 16),
+    activation='relu',
+    solver='adam',
+    max_iter=500,
+    early_stopping=True,
+    random_state=42
+)
+
+
+# 7. Train Model
+
+model.fit(X_train, y_train)
+
+
+# 8. Predict Test Data
+
+y_pred = model.predict(X_test)
+
+
+# 9. Calculate Accuracy
+
+print("\nAccuracy:", accuracy_score(y_test, y_pred) * 100, "%")
+
+
+# 10. Confusion Matrix
+
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+
+# 11. Predict New Customer
+
+new_customer = pd.DataFrame([{
+    'CreditScore': 600,
+    'Geography': 'Germany',
+    'Gender': 'Female',
+    'Age': 45,
+    'Tenure': 3,
+    'Balance': 80000,
+    'NumOfProducts': 1,
+    'HasCrCard': 1,
+    'IsActiveMember': 0,
+    'EstimatedSalary': 50000
+}])
+
+# Apply same encoding
+new_customer = pd.get_dummies(new_customer, drop_first=True, dtype=int)
+new_customer = new_customer.reindex(columns=X.columns, fill_value=0)
+
+# Normalize new customer data
+new_customer = sc.transform(new_customer)
+
+# Predict
+pred = model.predict(new_customer)
+
+if pred[0] == 1:
+    print("\nCustomer will Leave the Bank")
+else:
+    print("\nCustomer will Stay with the Bank")
+
+
+# 12. Final Result
+
+print("\nFinal Result:")
+print("0 - Customer will Stay")
+print("1 - Customer will Leave")
+print("Bank Customer Churn Prediction Completed Successfully.")
+
+
+
+
+
+///
+
+# 2. Read Dataset in Google Colab
+
+from google.colab import files
+
+uploaded = files.upload()
+
+df = pd.read_csv("Churn_Modelling.csv")
+
+print("Dataset:")
+print(df.head())
+
+print("\nDataset Shape:")
+print(df.shape)
+
+///
