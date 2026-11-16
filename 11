@@ -1,0 +1,206 @@
+
+# CELL 1: IMPORT REQUIRED LIBRARIES
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
+
+
+# CELL 2: LOAD DATASET
+df = pd.read_csv("emails.csv")
+
+print("Dataset:")
+print(df.head())
+
+print("\nDataset Shape:")
+print(df.shape)
+
+print("\nMissing Values:")
+print(df.isnull().sum().sum())
+
+
+# CELL 3: DATA PREPROCESSING
+
+# Remove Email Number column
+df = df.drop('Email No.', axis=1, errors='ignore')
+
+# Remove missing values
+df = df.dropna()
+
+# Separate input and output
+X = df.drop('Prediction', axis=1)
+y = df['Prediction']
+
+print("Features:")
+print(X.head())
+
+print("\nTarget:")
+print(y.head())
+
+
+# CELL 4: SPLIT DATASET INTO TRAINING AND TESTING
+
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+print("Training Data:", X_train.shape)
+print("Testing Data:", X_test.shape)
+
+
+# CELL 5: FEATURE SCALING
+
+sc = StandardScaler()
+
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
+
+print("Feature Scaling Completed")
+
+
+# CELL 6: K-NEAREST NEIGHBORS (KNN) CLASSIFICATION
+
+
+knn = KNeighborsClassifier(n_neighbors=5)
+
+knn.fit(X_train, y_train)
+
+pred1 = knn.predict(X_test)
+
+knn_acc = accuracy_score(y_test, pred1) * 100
+
+print("KNN Accuracy:", knn_acc, "%")
+
+print("\nKNN Confusion Matrix:")
+print(confusion_matrix(y_test, pred1))
+
+
+# CELL 7: SUPPORT VECTOR MACHINE (SVM) CLASSIFICATION
+
+svm = SVC(kernel='linear')
+
+svm.fit(X_train, y_train)
+
+pred2 = svm.predict(X_test)
+
+svm_acc = accuracy_score(y_test, pred2) * 100
+
+print("SVM Accuracy:", svm_acc, "%")
+
+print("\nSVM Confusion Matrix:")
+print(confusion_matrix(y_test, pred2))
+
+
+# CELL 8: CLASSIFICATION REPORT
+
+
+print("KNN Classification Report")
+print(classification_report(y_test, pred1))
+
+print("\nSVM Classification Report")
+print(classification_report(y_test, pred2))
+
+
+# CELL 9: KNN CONFUSION MATRIX VISUALIZATION
+
+
+cm1 = confusion_matrix(y_test, pred1)
+
+plt.figure(figsize=(5, 4))
+sns.heatmap(cm1, annot=True, fmt='d', cmap='Blues')
+
+plt.title("KNN Confusion Matrix")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+
+plt.show()
+
+
+
+# CELL 10: SVM CONFUSION MATRIX VISUALIZATION
+
+cm2 = confusion_matrix(y_test, pred2)
+
+plt.figure(figsize=(5, 4))
+sns.heatmap(cm2, annot=True, fmt='d', cmap='Greens')
+
+plt.title("SVM Confusion Matrix")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+
+plt.show()
+
+
+# CELL 11: MODEL ACCURACY COMPARISON
+
+print("KNN Accuracy:", knn_acc, "%")
+print("SVM Accuracy:", svm_acc, "%")
+
+models = ['KNN', 'SVM']
+accuracy = [knn_acc, svm_acc]
+
+plt.figure(figsize=(6, 4))
+plt.bar(models, accuracy)
+
+plt.xlabel("Classification Models")
+plt.ylabel("Accuracy (%)")
+plt.title("KNN vs SVM Accuracy Comparison")
+plt.ylim(0, 100)
+
+plt.show()
+
+
+
+# CELL 12: FINAL RESULT AND PRACTICAL CONCLUSION
+
+results = pd.DataFrame({
+    "Evaluation": ["Accuracy"],
+    "KNN": [round(knn_acc, 2)],
+    "SVM": [round(svm_acc, 2)]
+})
+
+print("MODEL PERFORMANCE COMPARISON")
+display(results)
+
+if svm_acc > knn_acc:
+    print("Final Result: SVM performs better than KNN.")
+else:
+    print("Final Result: KNN performs better than SVM.")
+
+
+
+
+///
+
+# CELL 2: LOAD DATASET IN GOOGLE COLAB
+
+from google.colab import files
+
+uploaded = files.upload()
+
+df = pd.read_csv("emails.csv")
+
+print("Dataset:")
+print(df.head())
+
+print("\nDataset Shape:")
+print(df.shape)
+
+print("\nMissing Values:")
+print(df.isnull().sum().sum())
+
+
+///
+
+
+    
