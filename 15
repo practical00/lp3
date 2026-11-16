@@ -32,3 +32,91 @@ contract BankAccount {
         return balances[msg.sender];
     }
 }
+
+
+
+==============================================================================================
+
+
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract BookManagement {
+
+    struct Book {
+        uint id;
+        string title;
+        string author;
+        bool isIssued;
+        address issuedTo;
+    }
+
+    // Store all books
+    Book[] public books;
+
+    // Add a new book
+    function addBook(
+        uint _id,
+        string memory _title,
+        string memory _author
+    ) public {
+        books.push(Book(_id, _title, _author, false, address(0)));
+    }
+
+    // Display book details
+    function getBook(uint _index)
+        public
+        view
+        returns (uint, string memory, string memory, bool, address)
+    {
+        require(_index < books.length, "Book not found");
+
+        Book memory b = books[_index];
+
+        return (
+            b.id,
+            b.title,
+            b.author,
+            b.isIssued,
+            b.issuedTo
+        );
+    }
+
+    // Update book details
+    function updateBook(
+        uint _index,
+        string memory _title,
+        string memory _author
+    ) public {
+        require(_index < books.length, "Book not found");
+        require(!books[_index].isIssued, "Book is issued");
+
+        books[_index].title = _title;
+        books[_index].author = _author;
+    }
+
+    // Issue a book
+    function issueBook(uint _index) public {
+        require(_index < books.length, "Book not found");
+        require(!books[_index].isIssued, "Book already issued");
+
+        books[_index].isIssued = true;
+        books[_index].issuedTo = msg.sender;
+    }
+
+    // Return a book
+    function returnBook(uint _index) public {
+        require(_index < books.length, "Book not found");
+        require(books[_index].isIssued, "Book is not issued");
+        require(books[_index].issuedTo == msg.sender, "Not your book");
+
+        books[_index].isIssued = false;
+        books[_index].issuedTo = address(0);
+    }
+
+    // Get total number of books
+    function getBookCount() public view returns (uint) {
+        return books.length;
+    }
+}
