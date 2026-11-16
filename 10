@@ -1,0 +1,166 @@
+# 1. Import Libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+
+
+# 2. Load Dataset
+df = pd.read_csv("uber.csv")
+
+print("Dataset:")
+print(df.head())
+
+
+# 3. Pre-processing
+df = df.drop(['Unnamed: 0', 'key'], axis=1, errors='ignore')
+
+df['pickup_datetime'] = pd.to_datetime(df['pickup_datetime'], errors='coerce')
+df['hour'] = df['pickup_datetime'].dt.hour
+
+df = df.drop(['pickup_datetime'], axis=1)
+df = df.dropna()
+df = df[df['fare_amount'] > 0]
+
+print("\nAfter Pre-processing:")
+print(df.head())
+
+
+# 4. Identify Outliers
+sns.boxplot(x=df['fare_amount'])
+plt.title("Outliers Detection")
+plt.show()
+
+
+# 5. Remove Outliers
+Q1 = df['fare_amount'].quantile(0.25)
+Q3 = df['fare_amount'].quantile(0.75)
+IQR = Q3 - Q1
+
+df = df[(df['fare_amount'] >= Q1 - 1.5 * IQR) &
+        (df['fare_amount'] <= Q3 + 1.5 * IQR)]
+
+
+# 6. Correlation
+plt.figure(figsize=(8, 5))
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
+plt.title("Correlation Heatmap")
+plt.show()
+
+
+# 7. Select Features
+X = df[['pickup_longitude', 'pickup_latitude',
+        'dropoff_longitude', 'dropoff_latitude',
+        'passenger_count', 'hour']]
+
+y = df['fare_amount']
+
+
+# 8. Split Dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+
+# 9. Linear Regression
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+
+y_pred1 = lr.predict(X_test)
+
+
+# 10. Random Forest Regression
+rf = RandomForestRegressor(n_estimators=50, random_state=42)
+rf.fit(X_train, y_train)
+
+y_pred2 = rf.predict(X_test)
+
+
+# 11. Model Evaluation
+
+print("\nLinear Regression Results")
+
+mae1 = mean_absolute_error(y_test, y_pred1)
+rmse1 = mean_squared_error(y_test, y_pred1) ** 0.5
+r2_1 = r2_score(y_test, y_pred1)
+
+print("MAE:", mae1)
+print("RMSE:", rmse1)
+print("R2 Score:", r2_1)
+print("R2 Percentage:", r2_1 * 100, "%")
+
+
+print("\nRandom Forest Results")
+
+mae = mean_absolute_error(y_test, y_pred2)
+rmse = mean_squared_error(y_test, y_pred2) ** 0.5
+r2 = r2_score(y_test, y_pred2)
+
+print("MAE:", mae)
+print("RMSE:", rmse)
+print("R2 Score:", r2)
+print("R2 Percentage:", r2 * 100, "%")
+
+
+# 12. Compare Models
+results = pd.DataFrame({
+    'Model': ['Linear Regression', 'Random Forest'],
+    'MAE': [mae1, mae],
+    'RMSE': [rmse1, rmse],
+    'R2 Score': [r2_1, r2]
+})
+
+print("\nModel Comparison:")
+print(results)
+
+
+# 13. Predict New Uber Fare
+ride = pd.DataFrame([{
+    "pickup_longitude": -73.98,
+    "pickup_latitude": 40.75,
+    "dropoff_longitude": -73.99,
+    "dropoff_latitude": 40.73,
+    "passenger_count": 1,
+    "hour": 10
+}])
+
+print("\nPredicted Uber Fare: $", round(rf.predict(ride)[0], 2))
+
+
+# 14. Actual vs Predicted Graph
+plt.figure(figsize=(8, 5))
+
+plt.scatter(y_test, y_pred2)
+
+a = min(y_test.min(), y_pred2.min())
+b = max(y_test.max(), y_pred2.max())
+
+plt.plot([a, b], [a, b], color='red',
+         linewidth=2, label='Perfect Prediction')
+
+plt.xlabel("Actual Fare")
+plt.ylabel("Predicted Fare")
+plt.title("Actual vs Predicted Uber Fare")
+
+plt.legend()
+plt.grid()
+plt.show()
+
+
+
+
+///
+from google.colab import files
+
+uploaded = files.upload()
+
+df = pd.read_csv("uber.csv")
+
+print("Dataset:")
+print(df.head())
+///
