@@ -120,3 +120,138 @@ contract BookManagement {
         return books.length;
     }
 }
+
+
+===========================================================================================================
+
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract Library {
+
+    // Structure to store book details
+    struct Book {
+        uint id;
+        string name;
+        string author;
+        bool isIssued;
+        address issuedTo;
+    }
+
+    // Array to store books
+    Book[] public books;
+
+    // Add a new book
+    function addBook(
+        uint _id,
+        string memory _name,
+        string memory _author
+    ) public {
+        for (uint i = 0; i < books.length; i++) {
+            require(books[i].id != _id, "Book ID already exists");
+        }
+
+        books.push(Book(
+            _id,
+            _name,
+            _author,
+            false,
+            address(0)
+        ));
+    }
+
+    // View book details
+    function getBook(uint _index)
+        public
+        view
+        returns (uint, string memory, string memory, bool, address)
+    {
+        require(_index < books.length, "Book not found");
+
+        Book memory b = books[_index];
+
+        return (
+            b.id,
+            b.name,
+            b.author,
+            b.isIssued,
+            b.issuedTo
+        );
+    }
+
+    // Search book using ID
+    function searchBook(uint _id)
+        public
+        view
+        returns (uint, string memory, string memory, bool, address)
+    {
+        for (uint i = 0; i < books.length; i++) {
+            if (books[i].id == _id) {
+                Book memory b = books[i];
+
+                return (
+                    b.id,
+                    b.name,
+                    b.author,
+                    b.isIssued,
+                    b.issuedTo
+                );
+            }
+        }
+
+        revert("Book not found");
+    }
+
+    // Update book details
+    function updateBook(
+        uint _index,
+        string memory _name,
+        string memory _author
+    ) public {
+        require(_index < books.length, "Book not found");
+        require(!books[_index].isIssued, "Book is issued");
+
+        books[_index].name = _name;
+        books[_index].author = _author;
+    }
+
+    // Issue book
+    function issueBook(uint _index) public {
+        require(_index < books.length, "Book not found");
+        require(!books[_index].isIssued, "Book already issued");
+
+        books[_index].isIssued = true;
+        books[_index].issuedTo = msg.sender;
+    }
+
+    // Return book
+    function returnBook(uint _index) public {
+        require(_index < books.length, "Book not found");
+        require(books[_index].isIssued, "Book is not issued");
+        require(
+            books[_index].issuedTo == msg.sender,
+            "Only issued user can return"
+        );
+
+        books[_index].isIssued = false;
+        books[_index].issuedTo = address(0);
+    }
+
+    // Delete book
+    function deleteBook(uint _index) public {
+        require(_index < books.length, "Book not found");
+        require(!books[_index].isIssued, "Return book first");
+
+        for (uint i = _index; i < books.length - 1; i++) {
+            books[i] = books[i + 1];
+        }
+
+        books.pop();
+    }
+
+    // Get total number of books
+    function getBookCount() public view returns (uint) {
+        return books.length;
+    }
+}
