@@ -1,0 +1,87 @@
+
+# PR4: K-Nearest Neighbors Algorithm on Diabetes Dataset
+
+# 1. Import Libraries
+import pandas as pd
+from google.colab import files
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+
+from sklearn.metrics import (
+    confusion_matrix,
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score
+)
+
+# 2. Upload Dataset
+uploaded = files.upload()
+
+# 3. Load Dataset
+df = pd.read_csv("diabetes.csv")
+
+print("First 5 Rows of Dataset:")
+print(df.head())
+
+print("\nDataset Shape:")
+print(df.shape)
+
+# 4. Separate Features and Target
+X = df.drop("Outcome", axis=1)
+y = df["Outcome"]
+
+# 5. Split Dataset into Training and Testing
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+
+print("\nTraining Data:", X_train.shape)
+print("Testing Data:", X_test.shape)
+
+# 6. Feature Scaling
+sc = StandardScaler()
+
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
+
+# 7. Apply KNN Algorithm
+knn = KNeighborsClassifier(n_neighbors=5)
+
+# 8. Train the Model
+knn.fit(X_train, y_train)
+
+# 9. Predict Output
+y_pred = knn.predict(X_test)
+
+# 10. Calculate Performance Metrics
+cm = confusion_matrix(y_test, y_pred)
+
+accuracy = accuracy_score(y_test, y_pred)
+error_rate = 1 - accuracy
+precision = precision_score(y_test, y_pred, zero_division=0)
+recall = recall_score(y_test, y_pred, zero_division=0)
+f1 = f1_score(y_test, y_pred, zero_division=0)
+
+# 11. Display Results
+print("\nConfusion Matrix:")
+print(cm)
+
+print("\nAccuracy:", accuracy * 100, "%")
+print("Error Rate:", error_rate * 100, "%")
+print("Precision:", precision)
+print("Recall:", recall)
+print("F1 Score:", f1)
+
+# 12. Final Result
+print("\nKNN Classification Completed Successfully.")
+
+
+from google.colab import files
+uploaded = files.upload()
